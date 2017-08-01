@@ -1,0 +1,55 @@
+<AppScreen>
+    BoxLayout:
+        orientation: "horizontal"
+        XButton:
+            size: 150, 200
+            background_color:(0,0,0,1)
+            on_release:root._open_link()
+            Image:
+                source: "./logo/logo.png"
+                pos:self.parent.pos
+                width:self.parent.width
+                height:self.parent.height
+                id: ce_logo
+        Label:
+            text:"Grand Slam - Simpson Analysis"
+            markup: True
+            size_hint: None, None
+            size: 300, 200
+            pos_hint: {"center_y": 0.5, "center_x": 0.5}
+    BoxLayout:
+        orientation: "vertical"
+        id: box_2
+        XButton:
+            text: 'Select Folder'
+            on_release: root._folder_dialog()
+            size_hint: None, None
+            size: 150, 50
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            id: folder_button
+        Label:
+            text: "Selected Folder:    " + root.default_folder
+            size: 450, 30
+            size_hint: None, None
+            id: text_input
+    FloatLayout:
+        ToggleButton:
+            text: "Stop" if self.state == "down" else "Start"
+            size: 150, 50
+            size_hint: None, None
+            pos_hint: {"center_y": 0.5, "center_x": 0.5}
+            group: "start"
+            on_state: root.start(*args)
+            id: start_button
+    BoxLayout:
+        orientation: "vertical"
+        TextInput:
+            text: ""
+            hint_text: "Log Output"
+            background_color: (.1,.1,.1,1)
+            cursor_color: (1,1,1,1)
+            foreground_color:(1,1,1,1)
+            selection_color:(1,1,1,1)
+            multiline: True
+            readonly: True
+            id: log_output
