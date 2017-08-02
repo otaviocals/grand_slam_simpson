@@ -21,16 +21,27 @@ import sys
 # Webscrapping Stage #
 ######################
 
-def GrandSlamScraper(folder,  phantom_path = ""):
+def GrandSlamScraper(folder,  phantom_path = "",year="",tourn="",mode=""):
 
-    #Australian Open Results URLs
 
-    url="http://www.espn.com/tennis/scoreboard/_/year/2017/tournamentId/154/matchType/1"
+    tourn_names = ["AUS","FRE","WIM","USO"]
+    tourn_codes = ["154","172","188","189"]
+    tourn_name = tourn_names[tourn]
+    tourn_code = tourn_codes[tourn]
+
+    mode_names = ["MEN_SING","WOM_SING","MEN_DOUB","WOM_DOUB","TEAM_CUP","MIX_DOUB"]
+    mode_name = mode_names[mode]
+    mode += 1
+
+    url="http://www.espn.com/tennis/scoreboard/_/year/"+str(year)+"/tournamentId/"+tourn_code+"/matchType/"+str(mode)
+
 
     rows = []
     row = []
     append_to_csv = False
     current_os = platform
+
+    lines = list()
 
     if current_os.startswith("linux"):
         slash = "/"
@@ -63,7 +74,6 @@ def GrandSlamScraper(folder,  phantom_path = ""):
 
     #Getting Newest Data Date
 
-        print(url)
         browser.get(url)
         while tries <= 20:
 
@@ -83,37 +93,88 @@ def GrandSlamScraper(folder,  phantom_path = ""):
                     "//div[@class=\"span-4\"]/div[@class=\"span-2 last\"]")
 
             for i in range(len(titles_source)):
-                title = titles_source[i].text
+                title = titles_source[i].text[2:].split(":")[0].upper().replace(" ","_")
+
+                if mode < 3:
+                    match_container = "matchContainer"
+                else:
+                    match_container = "matchContainerDoubles"
 
                 matches_clear = matches_clear_source[i].find_elements_by_xpath(
-                        "./div[@class=\"matchContainer\"]")
+                        "./div[@class=\""+match_container+"\"]")
                 matches_last = matches_last_source[i].find_elements_by_xpath(
-                    "./div[@class=\"matchContainer\"]")
+                    "./div[@class=\""+match_container+"\"]")
 
                 matches = matches_clear + matches_last
 #add for here
-                name1 = matches[
-                        0].find_elements_by_xpath(
-                        "./div[@class=\"matchInfo\"]//td[@class=\"teamLine\"]/a")[
-                                0].text
-                win1 = len(matches[
-                        0].find_elements_by_xpath(
-                        "./div[@class=\"matchInfo\"]//td[@class=\"teamLine\"]"+
-                        "/div[@class=\"arrowWrapper\"]"))
+                for j in range(len(matches)):
+                #for j in range(1):
+                        name1 = matches[
+                                j].find_elements_by_xpath(
+                                "./div[@class=\"matchInfo\"]//td[@class=\"teamLine\"]"+
+                                "/a")[0].text
+                        name12 = "NA"
+                        win1 = len(matches[
+                                j].find_elements_by_xpath(
+                                "./div[@class=\"matchInfo\"]//td[@class=\"teamLine\"]"+
+                                "/div[@class=\"arrowWrapper\"]"))==1
+                        points1 = matches[
+                                j].find_elements_by_xpath(
+                                "./div[@class=\"linescore\"]//td[@class=\"lsLine2\"]")
+                        for k in range(len(points1)):
+                            points1[k] = points1[k].text
+                        points1 = points1 + ["NA"]*(5-len(points1))
 
-                name2 = matches[
-                        0].find_elements_by_xpath(
-                        "./div[@class=\"matchInfo\"]//td[@class=\"teamLine2\"]/a")[
-                                0].text
+                        if mode >= 3:
+                            name12 =  matches[
+                                        j].find_elements_by_xpath(
+                                        "./div[@class=\"matchInfo\"]/table/tbody/"+
+                                        "tr[3]/td/a")[0].text
+                            win1 = len(matches[
+                                    j].find_elements_by_xpath(
+                                    "./div[@class=\"matchInfo\"]/table/tbody/tr[3]/td"+
+                                    "/div[@class=\"arrowWrapper\"]"))==1
 
-                win2 = len(matches[
-                        0].find_elements_by_xpath(
-                        "./div[@class=\"matchInfo\"]//td[@class=\"teamLine2\"]"+
-                        "/div[@class=\"arrowWrapper\"]"))
-                print(name1)
-                print(win1)
-                print(name2)
-                print(win2)
+                        line1 = [str(year)] + [tourn_name] + [mode_name] + [title] + [name1] + [name12] + [str(win1)] + points1
+                        line1 = [",".join(line1)]
+
+                        name2 = matches[
+                                j].find_elements_by_xpath(
+                                "./div[@class=\"matchInfo\"]//td[@class=\"teamLine2\"]"
+                                +"/a")[0].text
+                        name22 = "NA"
+                        win2 = len(matches[
+                                j].find_elements_by_xpath(
+                                "./div[@class=\"matchInfo\"]//td[@class=\"teamLine2\"]"+
+                                "/div[@class=\"arrowWrapper\"]"))==1
+                        points2 = matches[
+                                j].find_elements_by_xpath(
+                                "./div[@class=\"linescore\"]//td[@class=\"lsLine3\"]")
+                        for k in range(len(points2)):
+                            points2[k] = points2[k].text
+                        points2 = points2 + ["NA"]*(5-len(points2))
+                        if mode >= 3:
+                            name22 =  matches[
+                                        j].find_elements_by_xpath(
+                                        "./div[@class=\"matchInfo\"]/table/tbody/"+
+                                        "tr[5]/td/a")[0].text
+                            win2 = len(matches[
+                                    j].find_elements_by_xpath(
+                                    "./div[@class=\"matchInfo\"]/table/tbody/tr[5]/td"+
+                                    "/div[@class=\"arrowWrapper\"]"))==1
+
+
+                        line2 = [str(year)] + [tourn_name] + [mode_name] + [title] + [name2] + [name22] + [str(win2)] + points2
+                        line2 = [",".join(line2)]
+
+                        lines = lines + line1 + line2
+
+                        #print(j)
+                        print(line1)
+                        print(line2)
+                #print(type(list(name1)))
+                #print(type(list(str(win1))))
+                #print(type(points1))
                 #print(len(matches_last))
 
             data_string = data_source.text.encode('utf8')
@@ -127,6 +188,7 @@ def GrandSlamScraper(folder,  phantom_path = ""):
         #print(len(matches_clear_source))
         #print(len(matches_last_source))
 
+    return lines
 
 
 

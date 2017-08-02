@@ -30,6 +30,7 @@ from kivy.config import Config
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
 from kivy.clock import Clock
+from csv import writer, reader
 from os.path import join, isdir, expanduser, isfile
 from os import makedirs
 from sys import platform
@@ -61,7 +62,7 @@ from pprint import pprint
 #Setting configurations
 
 Config.set("kivy","log_enable","0")
-Config.set("kivy","log_level","debug")
+Config.set("kivy","log_level","critical")
 Config.set("graphics","position","custom")
 Config.set("graphics","top","10")
 Config.set("graphics","left","10")
@@ -148,7 +149,18 @@ class AppScreen(GridLayout):
 
     #Scraping Grand Slam Data
 
-        GrandSlamScraper(sel_folder,phantom_path)
+        lines = list()
+
+        for i in [2017,2016,2015,2014,2013]:
+            for j in range(4):
+                for k in range(6):
+                    lines = lines + GrandSlamScraper(sel_folder,phantom_path,i,j,k)
+
+
+        with open(sel_folder+slash+"data"+slash+"grand_slam.csv","w",encoding="utf-8",newline="") as g:
+            csv_file = writer(g,delimiter=",")
+            csv_file.writerow(["Year","Tournament","Category","Match","Player1","Player2","Win","Set 1","Set 2","Set 3","Set 4","Set 5"])
+            csv_file.writerows([c.strip() for c in r.split(",")] for r in lines)
 
     #Running R scripts
 
