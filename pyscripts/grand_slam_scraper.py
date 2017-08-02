@@ -109,6 +109,8 @@ def GrandSlamScraper(folder,  phantom_path = "",year="",tourn="",mode=""):
 #add for here
                 for j in range(len(matches)):
                 #for j in range(1):
+                        if len(matches[j].find_elements_by_xpath("./div[@class=\"matchInfo\"]//div[@class=\"arrowWrapper\"]"))!=1:
+                            continue
                         name1 = matches[
                                 j].find_elements_by_xpath(
                                 "./div[@class=\"matchInfo\"]//td[@class=\"teamLine\"]"+
