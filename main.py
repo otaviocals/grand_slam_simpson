@@ -176,8 +176,8 @@ class AppScreen(GridLayout):
 
             log_file.close()
 
-            r_output = subprocess.check_output(["Rscript",r_script_path+slash+"simpson_analysis.R", slash, sel_folder, r_script_path,r_libs_path, sel_folder+slash+"logs"+slash+"history.log"],universal_newlines=True)
-            print(r_output)
+            r_output = subprocess.check_output(["Rscript",r_script_path+slash+"simpson_analysis.R", sel_folder,r_libs_path],universal_newlines=True)
+            #print(r_output)
 
             log_file = open((sel_folder+slash+"logs"+slash+"history.log"),"a",encoding="utf-8")
 
