@@ -149,18 +149,20 @@ class AppScreen(GridLayout):
 
     #Scraping Grand Slam Data
 
-        lines = list()
+        file_exists = Path(sel_folder+slash+"data"+slash+"grand_slam.csv").is_file()
+        if(not file_exists):
+            lines = list()
 
-        for i in [2017,2016,2015,2014,2013]:
-            for j in range(4):
-                for k in range(6):
-                    lines = lines + GrandSlamScraper(sel_folder,phantom_path,i,j,k)
+            for i in [2017,2016,2015,2014,2013]:
+                for j in range(4):
+                    for k in range(6):
+                        lines = lines + GrandSlamScraper(sel_folder,phantom_path,i,j,k)
 
 
-        with open(sel_folder+slash+"data"+slash+"grand_slam.csv","w",encoding="utf-8",newline="") as g:
-            csv_file = writer(g,delimiter=",")
-            csv_file.writerow(["Year","Tournament","Category","Match","Player1","Player2","Win","Set 1","Set 2","Set 3","Set 4","Set 5"])
-            csv_file.writerows([c.strip() for c in r.split(",")] for r in lines)
+            with open(sel_folder+slash+"data"+slash+"grand_slam.csv","w",encoding="utf-8",newline="") as g:
+                csv_file = writer(g,delimiter=",")
+                csv_file.writerow(["Year","Tournament","Category","Match","Player1","Player2","Win","Set 1","Set 2","Set 3","Set 4","Set 5"])
+                csv_file.writerows([c.strip() for c in r.split(",")] for r in lines)
 
     #Running R scripts
 
@@ -168,14 +170,14 @@ class AppScreen(GridLayout):
 
         if(not r_verify == None):
 
-            print("Obtaining Google Data...")
-            log_file.write("Obtaining Google Data...\n")
-            self.ids.log_output.text += "Obtaining Google Data...\n"
+            print("Running Simpson Analysis...")
+            log_file.write("Running Simpson Analysis...\n")
+            self.ids.log_output.text += "Running Simpson Analysis...\n"
 
             log_file.close()
 
-            #r_output = subprocess.check_output(["Rscript",r_script_path+slash+"google_places_api.R", api_key, slash, sel_folder, r_script_path,r_libs_path, sel_folder+slash+"logs"+slash+"history.log"],universal_newlines=True)
-            #print(r_output)
+            r_output = subprocess.check_output(["Rscript",r_script_path+slash+"simpson_analysis.R", slash, sel_folder, r_script_path,r_libs_path, sel_folder+slash+"logs"+slash+"history.log"],universal_newlines=True)
+            print(r_output)
 
             log_file = open((sel_folder+slash+"logs"+slash+"history.log"),"a",encoding="utf-8")
 

@@ -78,18 +78,20 @@ def GrandSlamScraper(folder,  phantom_path = "",year="",tourn="",mode=""):
         while tries <= 20:
 
             #Getting Data
-            data_source = browser.find_element_by_xpath(
+            data_source = browser.find_elements_by_xpath(
                     "//div[@id=\"content\"]/div[@class=\"span-4\"]")
+            if len(data_source)==0:
+                return []
 
             #Getting Matches Titles
-            titles_source = data_source.find_elements_by_xpath(
+            titles_source = data_source[0].find_elements_by_xpath(
                     "//div[@class=\"matchTitle\"]")
 
             #Getting Matches Columns
-            matches_clear_source = data_source.find_elements_by_xpath(
+            matches_clear_source = data_source[0].find_elements_by_xpath(
                     "//div[@class=\"span-4\"]/div[@class=\"span-2 clear\"]")
 
-            matches_last_source = data_source.find_elements_by_xpath(
+            matches_last_source = data_source[0].find_elements_by_xpath(
                     "//div[@class=\"span-4\"]/div[@class=\"span-2 last\"]")
 
             for i in range(len(titles_source)):
@@ -179,7 +181,7 @@ def GrandSlamScraper(folder,  phantom_path = "",year="",tourn="",mode=""):
                 #print(type(points1))
                 #print(len(matches_last))
 
-            data_string = data_source.text.encode('utf8')
+            data_string = data_source[0].text.encode('utf8')
 
             if len(data_string) > 0:
                 break
